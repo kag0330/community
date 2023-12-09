@@ -1,0 +1,64 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Index</title>
+	<style type="text/css">
+		body {
+			text-align: center;
+		}
+	</style>
+</head>
+
+<body>
+	<h1 th:if="${not #strings.isEmpty(session.user)}" th:text="${session.user.nickname} + '님 환영합니다.'"></h1>
+	<div>
+		<th:block th:if="${#strings.isEmpty(session.user)}">
+			<h1>
+				<a href="/signup">회원가입</a>
+			</h1>
+			<h2>
+				<a href="/login">로그인</a>
+			</h2>
+		</th:block>
+		<h3>
+			<th:block th:if="${not #strings.isEmpty(session.user)}">
+				<div th:id="userIdDiv" th:if="${not #strings.isEmpty(session.user)}" th:text="${session.user.id}"
+					style="display: none;"></div>
+				<a href="/favoriteList">즐겨찾기 목록</a><br>
+
+				<a href="/logout">로그아웃</a><br>
+				<a onclick="deleteUser()" href="#">회원 탈퇴</a>
+
+			</th:block>
+		</h3>
+		<a href="/getBoardList">게시글 목록</a>
+		<br>
+		<th:block th:if="${not #strings.isEmpty(session.user)}">
+			<h3>읽지 않은 댓글 목록</h3>
+			<div th:each="board : ${session.user.boardList}">
+				<div th:each="comment : ${board.commentList}">
+					<div th:if="${(comment.isRead eq false) and not(comment.user.id eq session.user.id)}">
+						작성자 : <span th:text="${comment.user.id}"></span> |
+						내용 : <span th:href="@{/getBoard(seq=${comment.board.seq})}"
+							th:text="${comment.comment}">test</span> |
+						<a th:href="@{/getBoard(seq=${comment.board.seq},isRead=${comment.seq})}" th:text="바로가기"></a>
+					</div>
+				</div>
+			</div>
+		</th:block>
+	</div>
+	<script th:inline="javascript">
+		/* <![CDATA[ */
+		var userId = document.getElementById('userIdDiv').innerText;
+
+		function deleteUser() {
+			if (window.confirm("정말 회원탈퇴를 진행하시겠습니까?")) {
+				var deleteUrl = 'deleteUser?id=' + userId;
+				window.location.href = deleteUrl; 
+			}
+		}
+		/* ]]> */
+	</script>
+</body>
+
+</html>

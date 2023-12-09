@@ -1,0 +1,44 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>getBoardList</title>
+<style type="text/css">
+body {
+	text-align: center;
+}
+
+table {
+	text-align: center;
+	display: flex;
+	justify-content: center;
+}
+td{
+	padding: 5px;
+	min-width: 100px;
+}
+</style>
+</head>
+<body>
+	<h2>
+		<a href="/">메인으로</a> |
+		<a href="/insertBoard">게시글 작성하기</a>
+	</h2>
+	<table border="1">
+		<tr>
+			<th>번호</th>
+			<th>제목</th>
+			<th>닉네임</th>
+			<th>작성일</th>
+			<th>조회수</th>
+			<th>추천</th>
+		</tr>
+		<tr th:each="board : ${boardList}">
+			<td th:text="${board.seq}">1</td>
+			<td><a th:text="${board.title}" th:href="@{/getBoard(seq=${board.seq})}">2</a></td>
+			<td th:text="${board.user.nickname}">3</td>
+			<td th:text="${#dates.format(board.date,'yyyy-MM-dd')}">4</td>
+			<td th:text="${board.cnt}">5</td>
+			<td th:text="${#lists.size(board.boardLikes) - #lists.size(board.boardDislikes)}">6</td>
+		</tr>
+	</table>
+</body>
+</html>
