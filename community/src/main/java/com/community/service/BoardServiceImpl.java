@@ -15,7 +15,6 @@ import com.community.persistence.BoardLikesRepository;
 import com.community.persistence.BoardRepository;
 import com.community.persistence.UserRepository;
 
-import jakarta.transaction.Transactional;
 
 @Service
 public class BoardServiceImpl implements BoardService {
