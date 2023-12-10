@@ -1,5 +1,6 @@
 package com.community.controller;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -7,6 +8,7 @@ import com.community.dto.Alert;
 
 import jakarta.servlet.http.HttpSession;
 
+@Controller
 public class DefaultController {
 	/*
 	 * alert창을 띄움
@@ -18,7 +20,7 @@ public class DefaultController {
 	/*
 	 * 기본 index창
 	 * */
-	@GetMapping("/")
+	@GetMapping("")
 	public String index(HttpSession session) {
 		return "index";
 	}

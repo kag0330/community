@@ -15,6 +15,8 @@ import com.community.persistence.BoardLikesRepository;
 import com.community.persistence.BoardRepository;
 import com.community.persistence.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class BoardServiceImpl implements BoardService {
 	@Autowired
@@ -45,7 +47,7 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public void deleteBoard(Board board) {
-		boardRepository.findById(board.getSeq());
+		boardRepository.deleteById(board.getSeq());
 	}
 
 	@Override
@@ -71,11 +73,13 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public String likesBoard(Boolean like, int boardSeq, String userId) {
-		System.out.println("like : " + like + ", boardSeq : " + boardSeq + ", userId : "+userId);
+		
 		Optional<Board> findBoard = boardRepository.findById(boardSeq);
 		Optional<User> findUser = userRepository.findById(userId);
-		Optional<BoardLikes> findlikes = blRepository.findByBoard(findBoard.get());
-		Optional<BoardDislikes> finddlikes = bdlRepository.findByBoard(findBoard.get());
+		
+		Optional<BoardLikes> findlikes = blRepository.findByBoardAndUser(findBoard.get(),findUser.get());
+		Optional<BoardDislikes> finddlikes = bdlRepository.findByBoardAndUser(findBoard.get(),findUser.get());
+		
 		
 		//게시글의 작성자와 사용자의 작성자가 같을 경우
 		if(findBoard.get().getUser().getId().equals(userId)) {
@@ -99,17 +103,27 @@ public class BoardServiceImpl implements BoardService {
 		}
 		//좋아요를 이미 눌렀을 때 > 좋아요 취소
 		else if(like && findlikes.isPresent() && finddlikes.isEmpty()) {
-			blRepository.delete(findlikes.get());
+			findUser.get().getBoardLikesList().remove(findlikes.get());
+			findBoard.get().getBoardLikes().remove(findlikes.get());
+			userRepository.save(findUser.get());
+			boardRepository.save(findBoard.get());
 			return "좋아요를 취소했습니다.";
 		}
 		//싫어요를 이미 눌렀을 때 > 싫어요 취소
 		else if(!like && findlikes.isEmpty() && finddlikes.isPresent()) {
-			bdlRepository.delete(finddlikes.get());
+			findUser.get().getBoardDislikesList().remove(finddlikes.get());
+			findBoard.get().getBoardDislikes().remove(finddlikes.get());
+			userRepository.save(findUser.get());
+			boardRepository.save(findBoard.get());
 			return "싫어요를 취소했습니다.";
 		}
 		//좋아요를 눌렀는데 싫어요에 값이 존재할 때 > 싫어요 삭제 후 좋아요
 		else if(like && findlikes.isEmpty() && finddlikes.isPresent()) {
-			bdlRepository.delete(finddlikes.get());
+			findUser.get().getBoardDislikesList().remove(finddlikes.get());
+			findBoard.get().getBoardDislikes().remove(finddlikes.get());
+			userRepository.save(findUser.get());
+			boardRepository.save(findBoard.get());
+			
 			BoardLikes likes = new BoardLikes();
 			likes.setBoard(findBoard.get());
 			likes.setUser(findUser.get());
@@ -118,7 +132,11 @@ public class BoardServiceImpl implements BoardService {
 		}
 		//싫어요를 눌렀는데 좋아요에 값이 존재할 때 > 좋아요 삭제 후 싫어요
 		else if(!like && findlikes.isPresent() && finddlikes.isEmpty()) {
-			blRepository.delete(findlikes.get());
+			findUser.get().getBoardLikesList().remove(findlikes.get());
+			findBoard.get().getBoardLikes().remove(findlikes.get());
+			userRepository.save(findUser.get());
+			boardRepository.save(findBoard.get());
+			
 			BoardDislikes dlikes = new BoardDislikes();
 			dlikes.setBoard(findBoard.get());
 			dlikes.setUser(findUser.get());

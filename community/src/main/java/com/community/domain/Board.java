@@ -17,9 +17,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@Getter
-@Setter
-@Entity
+@Getter @Setter @Entity
 @ToString(exclude = {"user"})
 public class Board {
 	@Id
@@ -37,10 +35,10 @@ public class Board {
 	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<Favorite> favoriteList = new ArrayList<Favorite>();
 
-	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	private List<BoardLikes> boardLikes = new ArrayList<BoardLikes>();
 
-	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	private List<BoardDislikes> boardDislikes = new ArrayList<BoardDislikes>();
 	
 	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

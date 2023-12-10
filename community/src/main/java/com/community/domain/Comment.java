@@ -18,18 +18,17 @@ import lombok.ToString;
 public class Comment {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int seq;						//자동 PK
+	private int seq;
 	
-	private String comment;					//내용
-	private Date date = new Date();			//날짜
-	private Boolean isDeletetd = false;		//삭제유무
-	private Boolean isRead = false;			//확인유무
+	private String comment;					
+	private Date date = new Date();			
+	private Boolean isRead = false;			
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "USER_ID", nullable = false)
-	private User user;						//댓글 단 유저
+	private User user;						
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "BOARD_SEQ", nullable = false)
-	private Board board;					//댓글 단 게시글
+	private Board board;					
 }

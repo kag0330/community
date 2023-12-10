@@ -6,7 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.community.domain.Board;
 import com.community.domain.BoardDislikes;
+import com.community.domain.BoardLikes;
+import com.community.domain.User;
 
 public interface BoardDislikesRepository extends JpaRepository<BoardDislikes, Integer> {
-	Optional<BoardDislikes> findByBoard(Board board);
+	Optional<BoardDislikes> findByBoardAndUser(Board board, User user);
 }
