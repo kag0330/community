@@ -8,11 +8,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.community.domain.Board;
-import com.community.domain.Comment;
 import com.community.domain.User;
 import com.community.dto.Alert;
 import com.community.dto.LikeDislikeCounts;
@@ -32,12 +30,20 @@ public class BoardController {
 	@Autowired
 	private UserService userSerivce;
 
+	/*
+	 * 게시글 목록 표시
+	 * */
 	@GetMapping("/getBoardList")
 	public String getBoardList(Model model, Board board) {
 		model.addAttribute("boardList", boardService.getBoardList(board));
 		return "getBoardList";
 	}
-
+	/*
+	 * 게시글 표시
+	 * getBoard?isRead= 로 값이 들어오면 true로 변경 후 세션 갱신
+	 * getBoard에 접근하면 조회수 1증가
+	 * 평소에는 게시글과 댓글 목록만 모델로 추가
+	 * */
 	@GetMapping("/getBoard")
 	public String getBoard(HttpSession session, Board board, Model model, Integer isRead) {
 		boardService.updateCnt(board);
@@ -51,7 +57,11 @@ public class BoardController {
 		model.addAttribute("board", boardService.getBoard(board));
 		return "getBoard";
 	}
-
+	/*
+	 * 게시글 추가 페이지(GET)
+	 * 로그인X > session 값이 없음 로그인 해달라는 alert창을 띄움
+	 * 로그인O > 게시글 추가 페이지로 이동
+	 * */
 	@GetMapping("/insertBoard")
 	public String insertBoard(Model model, HttpSession session) {
 		User user = (User) session.getAttribute("user");
@@ -63,13 +73,21 @@ public class BoardController {
 			return "insertBoard";
 		}
 	}
+	/*
+	 * 게시글 추가 페이지(POST)
+	 * */
 
 	@PostMapping("/insertBoard")
 	public String insertBoard(Board board, String user) {
 		boardService.insertBoard(board, user);
 		return "redirect:getBoardList";
 	}
-
+	/*
+	 * 게시글 수정
+	 * 로그인X > session 값이 없음 로그인 해달라는 alert창을 띄움
+	 * 로그인O, 게시글UserId != 세션UserId > 게시글 수정 FAIL
+	 * 로그인O  게시글UserId == 세션UserId > 게시글 수정 OK
+	 * */
 	@PostMapping("/updateBoard")
 	public String updateBoard(Board board, HttpSession session, HttpServletRequest request, Model model)
 			throws Exception {
@@ -88,7 +106,12 @@ public class BoardController {
 			return DefaultController.showMessageAndRedirect(message, model);
 		}
 	}
-
+	/*
+	 * 게시글 삭제
+	 * 로그인X > session 값이 없음 로그인 해달라는 alert창을 띄움
+	 * 로그인O, 게시글UserId != 세션UserId > 게시글 삭제 FAIL
+	 * 로그인O, 게시글UserId == 세션UserId > 게시글 삭제 OK
+	 * */
 	@GetMapping("/deleteBoard")
 	public String deleteBoard(Board board, Model model, HttpSession session) {
 		User user = (User) session.getAttribute("user");
@@ -96,7 +119,7 @@ public class BoardController {
 		if (user == null) {
 			Alert message = new Alert("로그인 해주세요", "/login", RequestMethod.GET, null);
 			return DefaultController.showMessageAndRedirect(message, model);
-		} else if (!(user.getId().equals(findboard.getUser().getId()))) {
+		} else if ( !(user.getId().equals(findboard.getUser().getId())) ) {
 			Alert message = new Alert("아이디가 일치하지 않습니다.", "/getBoardList", RequestMethod.GET, null);
 			return DefaultController.showMessageAndRedirect(message, model);
 		} else {
@@ -106,6 +129,13 @@ public class BoardController {
 		}
 	}
 	
+	/*
+	 * Ajax
+	 * 게시글 좋아요 싫어요(추천) 버튼 동작
+	 * int boardSeq 게시글 번호
+	 * String userId 사용자 ID   
+	 * Boolean likes 좋아요1 싫어요 0
+	 * */
 	@GetMapping("/boardLike")
 	@ResponseBody
 	public ResponseEntity<String> boardLike(int boardSeq, String userId, Boolean likes) {
@@ -119,9 +149,13 @@ public class BoardController {
 	    }
 	}
 	
+	/*
+	 * Ajax
+	 * 게시글 좋아요 싫어요(추천) 개수 카운팅
+	 * */
 	@GetMapping("/getLikeDislikeCounts")
 	@ResponseBody
-    public LikeDislikeCounts getLikeDislikeCounts(@RequestParam int boardSeq) {
+    public LikeDislikeCounts getLikeDislikeCounts(int boardSeq) {
         int likesCount = boardService.getLikesCount(boardSeq);
         int dislikesCount = boardService.getDislikesCount(boardSeq); 
         return new LikeDislikeCounts(likesCount, dislikesCount);

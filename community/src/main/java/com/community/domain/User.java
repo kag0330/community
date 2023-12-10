@@ -9,7 +9,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -17,7 +16,7 @@ import lombok.ToString;
 @Getter @Setter
 @Entity
 @Table(name = "USERS")
-@ToString(exclude = {"board"})
+@ToString
 public class User {
 	@Id
 	private String id;

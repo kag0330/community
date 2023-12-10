@@ -27,11 +27,6 @@ public class BoardServiceImpl implements BoardService {
 	private UserRepository userRepository;
 
 	@Override
-	public void insertBoard(Board board) {
-		boardRepository.save(board);
-	}
-
-	@Override
 	public void insertBoard(Board board, String user) {
 		User findUser = userRepository.findById(user).get();
 		board.setUser(findUser);
@@ -79,8 +74,8 @@ public class BoardServiceImpl implements BoardService {
 		System.out.println("like : " + like + ", boardSeq : " + boardSeq + ", userId : "+userId);
 		Optional<Board> findBoard = boardRepository.findById(boardSeq);
 		Optional<User> findUser = userRepository.findById(userId);
-		Optional<BoardLikes> findlikes = blRepository.findByUser(findUser.get());
-		Optional<BoardDislikes> finddlikes = bdlRepository.findByUser(findUser.get());
+		Optional<BoardLikes> findlikes = blRepository.findByBoard(findBoard.get());
+		Optional<BoardDislikes> finddlikes = bdlRepository.findByBoard(findBoard.get());
 		
 		//게시글의 작성자와 사용자의 작성자가 같을 경우
 		if(findBoard.get().getUser().getId().equals(userId)) {

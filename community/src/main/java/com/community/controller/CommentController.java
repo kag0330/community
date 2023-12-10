@@ -12,7 +12,11 @@ import com.community.service.CommentService;
 public class CommentController {
 	@Autowired
 	private CommentService commentService;
-
+	/*
+	 * 댓글 등록 기능
+	 * 로그인X > session 값이 없음 로그인 해달라는 alert창을 띄움
+	 * 로그인O > 댓글 등록 기능 수행
+	 * */
 	@GetMapping("/addComment")
 	private ResponseEntity<String> addComment(String userId, int boardSeq, String comment) {
 		if (userId == null) {

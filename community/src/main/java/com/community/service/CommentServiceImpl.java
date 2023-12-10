@@ -13,9 +13,12 @@ import com.community.persistence.UserRepository;
 
 @Service
 public class CommentServiceImpl implements CommentService{
-	@Autowired private CommentRepository commentRepository;
-	@Autowired private BoardRepository boardRepository;
-	@Autowired private UserRepository userRepository;
+	@Autowired 
+	private CommentRepository commentRepository;
+	@Autowired 
+	private BoardRepository boardRepository;
+	@Autowired 
+	private UserRepository userRepository;
 
 	@Override
 	public void insertComment(String userId, int boardSeq, String commentStr) {

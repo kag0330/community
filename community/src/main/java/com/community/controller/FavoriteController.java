@@ -20,7 +20,11 @@ import jakarta.servlet.http.HttpSession;
 public class FavoriteController {
 	@Autowired
 	private FavoriteService favoriteService;
-	
+	/*
+	 * 즐겨찾기 목록
+	 * 로그인X > session 값이 없음 로그인 해달라는 alert창을 띄움
+	 * 로그인O > 즐겨찾기의 UserId 값으로 BoardList를 가져옴
+	 * */
 	@GetMapping("/favoriteList")
     public String getFavoriteBoards(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
@@ -32,6 +36,14 @@ public class FavoriteController {
             return "favoriteList";
         }
     }
+	
+	/*
+	 * Ajax
+	 * 게시글 즐겨찾기 버튼 동작 수행
+	 * 로그인X > session 값이 없음 로그인 해달라는 alert창을 띄움
+	 * 로그인O, Favorite에 항목이 없으면 > 즐겨찾기 등록
+	 * 로그인O, Favorite에 항목이 있으면 > 즐겨찾기 삭제
+	 * */
 	@GetMapping("/insertFavorite")
 	@ResponseBody
 	public ResponseEntity<String> insertFavorite(String userId, int boardSeq){
@@ -39,7 +51,7 @@ public class FavoriteController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 해주세요");
 		}
 		try {
-			if(favoriteService.insertFavorite(userId, boardSeq)) {
+			if(favoriteService.insertAndDeleteFavorite(userId, boardSeq)) {
 				return ResponseEntity.ok("즐겨찾기 등록 완료");
 			}
 				return ResponseEntity.ok("즐겨찾기 삭제 완료");

@@ -17,29 +17,43 @@ import jakarta.servlet.http.HttpSession;
 public class LoginController {
 	@Autowired
 	private UserService userService;
-	
+	/*
+	 * 회원가입페이지(GET)
+	 * */
 	@GetMapping("/signup")
 	public String signup(User user, Model model) {
 		model.addAttribute("user", user);
 		return "signup";
 	}
-	
+	/*
+	 * 회원가입페이지(POST)
+	 * user != null > 이미 존재하는 아이디는 회원가입 실패 
+	 * user == null > 존재하지 않는 아이디는 회원가입 성공
+	 * */
 	@PostMapping("/signup")
 	public String signupcheck(User user, Model model) {
-		if(!userService.insertUser(user)) {
+		if(userService.getUser(user) != null) {
 			Alert message = new Alert("이미 존재하는 아이디입니다.", "signup", RequestMethod.GET, null);
 			return DefaultController.showMessageAndRedirect(message, model);
 		}else {
+			userService.insertUser(user);
 			Alert message = new Alert("회원가입성공", "/", RequestMethod.GET, null);
 			return DefaultController.showMessageAndRedirect(message, model);
 		}	
 	}
-	
+	/*
+	 * 로그인페이지(GET)
+	 * */
 	@GetMapping("/login")
 	public String login() {
 		return "login";
 	}
-	
+	/*
+	 * 로그인페이지(POST)
+	 * findUser != null, findUser.pw == user.pw > 로그인 OK
+	 * findUser != null, findUser.pw != user.pw > 로그인 FAIL
+	 * findUser == null                         > 로그인 FAIL
+	 * */
 	@PostMapping("/login")
 	public String login(HttpSession session, User user, Model model) {
 		User findUser = userService.getUser(user);
@@ -54,13 +68,19 @@ public class LoginController {
 			return DefaultController.showMessageAndRedirect(message, model);
 		}
 	}
-
+	/*
+	 * 로그아웃
+	 * session 초기화
+	 * */
 	@GetMapping("/logout")
 	public String logout(HttpSession session) {
 		session.invalidate();
 		return "redirect:/";
 	}
-	
+	/*
+	 * 회원탈퇴
+	 * session 초기화 후 User 테이블에서 값 삭제
+	 * */
 	@GetMapping("/deleteUser")
 	public String deleteUser(HttpSession session, User user, Model model) {
 		session.invalidate();
